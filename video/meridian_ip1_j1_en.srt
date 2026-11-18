@@ -1,0 +1,68 @@
+1
+00:00:00,800 --> 00:00:07,416
+This is the Meridian IP-1 irrigation pump. This short video is about one solder joint on its main controller board.
+
+2
+00:00:08,866 --> 00:00:13,891
+Inside the pump, the main controller board drives the motor, the valve and the sensors.
+
+3
+00:00:14,141 --> 00:00:19,909
+The problem is at connector J1, the 24 V power input. Pin 2 is the ground pin.
+
+4
+00:00:21,359 --> 00:00:30,030
+This is a cut through that hole. The board has four copper layers, and this pin is tied solidly to the ground copper on three of them.
+
+5
+00:00:30,280 --> 00:00:37,012
+In wave soldering, solder enters from the bottom. But the large copper areas pull heat out of the hole.
+
+6
+00:00:37,262 --> 00:00:43,599
+The solder cools and freezes before it reaches the top. Here it fills only about 40% of the hole.
+
+7
+00:00:45,049 --> 00:00:51,270
+The requirement for this product is IPC Class 3. Solder must fill at least 75% of the hole.
+
+8
+00:00:51,520 --> 00:00:59,529
+From the bottom, this joint looks normal, and the connector body hides the top. A visual check will not catch it.
+
+9
+00:00:59,779 --> 00:01:06,430
+But the joint is weak. With vibration and heat it can crack, and the pump loses power.
+
+10
+00:01:07,880 --> 00:01:19,871
+Here is what we need changed in the wave soldering process. 1: More preheat. The top side of the board at this connector should reach at least 110 °C before it touches the wave.
+
+11
+00:01:20,121 --> 00:01:26,145
+2: Longer contact time. Slow the conveyor so this pin stays in the solder longer.
+
+12
+00:01:26,395 --> 00:01:32,059
+3: Flux. Make sure flux gets all the way through the hole to the top side.
+
+13
+00:01:32,309 --> 00:01:37,833
+With enough heat in the hole, the solder keeps flowing and fills the hole to the top.
+
+14
+00:01:39,283 --> 00:01:48,116
+Please check this joint by X-ray, not by eye. Measure the fill height on J1 pin 2. It must be 75% or more.
+
+15
+00:01:48,367 --> 00:01:51,697
+Send us the X-ray image with each lot.
+
+16
+00:01:53,147 --> 00:02:02,004
+To summarize: more preheat, longer contact time, flux through the hole, and X-ray proof of 75% fill.
+
+17
+00:02:02,253 --> 00:02:09,322
+On our side, the next board revision adds thermal relief on this pin, to make it easier to solder. Thank you.
+

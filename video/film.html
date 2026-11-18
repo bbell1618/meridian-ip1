@@ -1,0 +1,242 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+html,body{margin:0;background:#0f1720;overflow:hidden}
+#stage{position:relative;width:1920px;height:1080px;background:#0f1720;font-family:'Noto Sans CJK SC','Noto Sans',sans-serif;color:#e8eef4;overflow:hidden}
+#gl,#svg,#ov{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#gl canvas{display:block}
+.lab{position:absolute;transform:translate(-50%,-100%);background:rgba(15,23,32,.88);border:2px solid #2ec4b6;border-radius:10px;padding:8px 16px;font-size:26px;line-height:1.25;text-align:center;white-space:nowrap}
+.lab small{display:block;font-size:24px;color:#ffd98a}
+#head{position:absolute;left:44px;top:30px;font-size:26px;line-height:1.3;background:rgba(15,23,32,.82);padding:10px 18px;border-radius:10px;border-left:6px solid #2ec4b6}
+#head b{font-weight:700}#head span{color:#ffd98a}
+#demo{position:absolute;right:44px;top:34px;font-size:20px;color:#9fb0c0;text-align:right;line-height:1.3;background:rgba(15,23,32,.7);padding:6px 12px;border-radius:8px}
+#sub{position:absolute;left:0;top:888px;width:1920px;height:192px;background:#0a1017;border-top:2px solid #1f2c3a;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px}
+#sub div{max-width:1780px;text-align:center}
+#en{font-size:31px;line-height:1.25;color:#f2f5f8}#zh{font-size:33px;line-height:1.25;color:#ffd98a}
+#title{position:absolute;left:44px;top:28px;background:rgba(15,23,32,.82);padding:14px 26px 18px;border-radius:12px;border-left:8px solid #2ec4b6}
+#title h1{font-size:64px;margin:0;font-weight:900;letter-spacing:1px;text-shadow:0 4px 24px #000}
+#title h2{font-size:32px;margin:6px 0 0;font-weight:500;text-shadow:0 2px 14px #000}#title h2 span{color:#ffd98a}
+</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script></head><body>
+<div id="stage"><div id="gl"></div><svg id="svg" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg"></svg><div id="ov"></div>
+<div id="title"><h1>Meridian IP-1</h1><h2>Main controller board · one solder joint&nbsp;&nbsp;<span>主控板 · 一个焊点的问题</span></h2></div>
+<div id="head"><b>Meridian IP-1</b> · Main controller board · J1 pin 2 solder fill<br><span>主控板 · J1 第 2 脚 · 通孔透锡不良</span></div>
+<div id="demo">Demonstration example · hypothetical device<br>演示示例 · 假想设备</div>
+<div id="sub"><div id="en"></div><div id="zh"></div></div></div>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const ramp=(t,a,b)=>cl((t-a)/(b-a));
+const ease=x=>x*x*(3-2*x);
+const er=(t,a,b)=>ease(ramp(t,a,b));
+const lerp=(a,b,k)=>a+(b-a)*k;
+const CU=await (await fetch('cues.json')).json();
+const C=CU.cues, TOTAL=CU.total;
+const first=s=>C.find(c=>c.scene===s).start;
+const T=[0,0,first(2)-0.6,first(3)-0.6,first(4)-0.6,first(5)-0.6,first(6)-0.6,first(7)-0.6,TOTAL];   // T[k] = start of scene k
+window.SCENES=T;window.TOTAL=TOTAL;
+// ---------------- 3D ----------------
+const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true,alpha:false});r.setSize(1920,1080);r.setPixelRatio(1);$('gl').appendChild(r.domElement);
+r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.15;
+const scene=new THREE.Scene();scene.background=new THREE.Color('#0f1720');
+scene.environment=new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(),0.04).texture;
+scene.add(new THREE.HemisphereLight(0xffffff,0x334455,0.9));
+const dl=new THREE.DirectionalLight(0xffffff,1.4);dl.position.set(-200,400,-300);scene.add(dl);
+const dl2=new THREE.DirectionalLight(0xffffff,0.8);dl2.position.set(200,300,400);scene.add(dl2);
+const cam=new THREE.PerspectiveCamera(30,1920/1080,5,6000);
+const load=u=>new Promise(res=>new GLTFLoader().load(u,g=>res(g.scene)));
+const MAT={base_tray:['#2b323a',.1,.65],top_cover:['#e3e8ed',.05,.5],pump_housing:['#0d8fa0',.1,.4],pump_rotor:['#b9bfc7',.85,.3],pump_rollers:['#f2f2f2',0,.5],pump_tube:['#eaf4ff',0,.2],
+ stepper_gearmotor:['#23262b',.5,.45],motor_bracket:['#aeb5bd',.85,.35],solenoid_pinch_valve:['#2a5fc9',.2,.45],pressure_sensor_inlet:['#dba63a',.3,.4],pressure_sensor_outlet:['#dba63a',.3,.4],bubble_sensor:['#cc3b2f',.1,.5],
+ display:['#0c1218',.2,.2],keypad:['#0d8fa0',.1,.5],fan:['#1a1c20',.1,.6],dc_inlet_24v:['#b9bfc7',.85,.3],vh_header_bodies:['#efe9d6',0,.55],vh_header_pins:['#c9ced6',.8,.3],harness_24v_power:['#d81f1f',0,.6],harness_motor:['#15161a',0,.6],harness_valve:['#2a5fc9',0,.6],harness_sensors:['#e2b414',0,.6],main_controller_pcb:['#0f5a31',0,.6]};
+const mech=await load('meridian_ip1_mech.glb');scene.add(mech);
+const parts={};
+for(const ch of mech.children[0]?.children?.length?mech.children[0].children:mech.children){parts[ch.name]=ch;}
+if(!parts.top_cover){mech.traverse(o=>{if(MAT[o.name])parts[o.name]=o});}
+for(const [n,o] of Object.entries(parts)){const m=MAT[n];if(!m)continue;const mat=new THREE.MeshStandardMaterial({color:m[0],metalness:m[1],roughness:m[2],side:THREE.DoubleSide});
+  if(n==='pump_tube'){mat.transparent=true;mat.opacity=.55}
+  o.traverse(x=>{if(x.isMesh)x.material=mat});o.userData.mat=mat;}
+const board=await load('ip1_main_board.glb');
+{const bb=new THREE.Box3().setFromObject(board);const sz=bb.getSize(new THREE.Vector3());const k=sz.x<1?1000:1;const g=new THREE.Group();board.scale.setScalar(k);if(sz.z<sz.y)board.rotation.x=-Math.PI/2;g.add(board);
+ g.position.set(-95,11,-70);scene.add(g);window.boardBox=[bb.min.toArray(),bb.max.toArray(),k];
+ board.traverse(x=>{if(x.isMesh){x.material.side=THREE.DoubleSide;x.material.metalness=Math.min(x.material.metalness,.4);x.material.roughness=Math.max(x.material.roughness,.45)}});
+ const tl=new THREE.TextureLoader();const tex=await tl.loadAsync('board_top.jpg');tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=8;
+ const top=new THREE.Mesh(new THREE.PlaneGeometry(100,80),new THREE.MeshStandardMaterial({map:tex,roughness:.5,metalness:.1}));top.rotation.x=-Math.PI/2;top.position.set(55,11+1.6+0.03,30);scene.add(top);}
+// highlight ring for J1 pin 2  (device coords 11.5,-48.04 -> three x=11.5, z=48.04)
+const J1=new THREE.Vector3(11.5,12.7,50.0), PIN2=new THREE.Vector3(11.5,12.7,48.04);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(9.5,0.55,12,64),new THREE.MeshBasicMaterial({color:'#ffb020',transparent:true,depthTest:false}));ring.rotation.x=Math.PI/2;ring.position.set(11.5,20.5,50.0);ring.renderOrder=10;scene.add(ring);
+const FADE=['top_cover','display','keypad','fan'];
+function cam3(t){
+  // scene 1: orbit the closed device. scene 2: lift the cover, swing over the top to the board, then push in on J1
+  const t2=T[2], cB=C[2].start;
+  const k1=er(t,t2-0.2,t2+3.6), k2=er(t,cB-0.3,cB+2.6);
+  let az=lerp(198+ (t/t2)*30, 338+(t-t2)*0.6, k1), el=lerp(13,50,k1), rad=lerp(590,470,k1);
+  let tgt=new THREE.Vector3(0,56,0).lerp(new THREE.Vector3(8,26,-6),k1);
+  az=lerp(az,376+ (t-cB)*0.8,k2); el=lerp(el,50,k2); rad=lerp(rad,92,k2); tgt.lerp(new THREE.Vector3(13,13,50),k2);
+  const a=az*Math.PI/180,e=el*Math.PI/180;
+  cam.position.set(tgt.x+rad*Math.cos(e)*Math.sin(a),tgt.y+rad*Math.sin(e),tgt.z+rad*Math.cos(e)*Math.cos(a));cam.lookAt(tgt);
+  const f=1-er(t,t2+0.2,t2+1.8);
+  for(const n of FADE){const o=parts[n];if(!o)continue;o.visible=f>0.01;o.userData.mat.transparent=f<0.999;o.userData.mat.opacity=f;o.userData.mat.depthWrite=f>0.5}
+  ring.visible=t>cB+0.4;ring.material.opacity=er(t,cB+0.4,cB+1.2)*(0.75+0.25*Math.sin(t*5));ring.scale.setScalar(1+0.05*Math.sin(t*5));
+}
+const proj=v=>{const p=v.clone().project(cam);return [(p.x+1)*960,(1-p.y)*540]};
+function labels3(t){
+  const a=C[1].start,b=C[2].start;let h='';
+  const L=[[new THREE.Vector3(-62,112,-10),'Stepper motor + gearbox','步进电机 + 减速箱',a+1.6],[new THREE.Vector3(-32.5,26,-52),'Pinch valve','电磁夹管阀',a+2.6],[new THREE.Vector3(-91.5,66,-103),'Pressure and bubble sensors','压力 / 气泡传感器',a+3.3],[new THREE.Vector3(70,16,30),'Main controller board','主控板',a+0.6]];
+  for(const [v,en,zh,t0] of L){const o=er(t,t0,t0+0.5)*(1-er(t,b-0.5,b));if(o<=0.01)continue;const [x,y]=proj(v);h+=`<div class="lab" style="left:${x}px;top:${y-14}px;opacity:${o}">${en}<small>${zh}</small></div>`}
+  const o=er(t,b+1.6,b+2.2);if(o>0.01){const [x,y]=proj(new THREE.Vector3(11.5,24,50));h+=`<div class="lab" style="left:${x+250}px;top:${y+10}px;opacity:${o};border-color:#ffb020"><b>J1</b> · 24 V power input · pin 2 = GND<small>J1 · 24 V 电源输入 · 第 2 脚 = 接地</small></div>`}
+  return h;
+}
+// ---------------- 2D cross-section ----------------
+const CX=1060,YT=250,YB=522,HW=144.5,PW=85,PL=9;         // 170 px per mm: board 1.6 mm, hole 1.7 mm, pin 1.0 mm
+const LAY=[[250,262,'L1','GND'],[296,308,'L2','GND'],[464,476,'L3','+3.3 V'],[510,522,'L4','GND']];
+const col={fr4:'#8f9457',cu:'#d4873f',cuHot:'#ff7a1a',pin:'#c9ced6',solder:'#dfe5ec',cold:'#868d96',body:'#e8e0cb',teal:'#2ec4b6',amb:'#ffb020',red:'#ff5a4f',grn:'#4cd97b',txt:'#e8eef4',zh:'#ffd98a',panel:'#16212c'};
+const tx=(x,y,s,size=24,fill=col.txt,anchor='start',w=500,o=1)=>`<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" text-anchor="${anchor}" font-weight="${w}" opacity="${o}" stroke="#0f1720" stroke-width="${size>30?7:4}" paint-order="stroke" stroke-linejoin="round">${s}</text>`;
+const bi=(x,y,en,zh,size=24,anchor='start',o=1)=>tx(x,y,en,size,col.txt,anchor,600,o)+tx(x,y+size*1.25,zh,size,col.zh,anchor,500,o);
+function xsec(o){   // o: {fill, frozen, wave (0..1), heat (0..1), flux (0..1), warm (0..1), labels (0..1), gnd (0..1 highlight), crack, topFillet, xray}
+  let s='';
+  const X=o.xray;
+  const fr4=X?'#5d5d5d':col.fr4, cu=X?'#4a4a4a':col.cu, pin=X?'#262626':col.pin, body=X?'#6a6a6a':col.body;
+  // connector body + pin
+  s+=`<rect x="700" y="70" width="720" height="176" rx="10" fill="${body}" stroke="${X?'#555':'#b9b095'}" stroke-width="3"/>`;
+  // board
+  s+=`<rect x="0" y="${YT}" width="1920" height="${YB-YT}" fill="${fr4}"/>`;
+  if(!X){const w=o.warm||0;if(w>0)s+=`<rect x="0" y="${YT}" width="1920" height="${YB-YT}" fill="#ff7a1a" opacity="${0.28*w}"/>`}
+  for(const [y0,y1,n,net] of LAY){
+    if(n==='L3'){s+=`<rect x="0" y="${y0}" width="${CX-HW-48}" height="${y1-y0}" fill="${X?'#505050':'#c9a13f'}"/><rect x="${CX+HW+48}" y="${y0}" width="900" height="${y1-y0}" fill="${X?'#505050':'#c9a13f'}"/>`}
+    else s+=`<rect x="0" y="${y0}" width="1920" height="${y1-y0}" fill="${cu}"/>`;
+  }
+  // heat glow on the ground layers next to the barrel
+  if(!X&&o.heat>0){for(const [y0,y1,n] of LAY){if(n==='L3')continue;for(const d of [-1,1]){const x0=d<0?CX-HW-520:CX+HW;s+=`<rect x="${x0}" y="${y0-3}" width="520" height="${y1-y0+6}" fill="url(#heat${d<0?'L':'R'})" opacity="${o.heat}"/>`}}}
+  // mask
+  if(!X){s+=`<rect x="0" y="${YT-5}" width="${CX-HW-90}" height="5" fill="#1f7a45"/><rect x="${CX+HW+90}" y="${YT-5}" width="900" height="5" fill="#1f7a45"/><rect x="0" y="${YB}" width="${CX-HW-90}" height="5" fill="#1f7a45"/><rect x="${CX+HW+90}" y="${YB}" width="900" height="5" fill="#1f7a45"/>`}
+  // hole: clear, barrel plating
+  s+=`<rect x="${CX-HW}" y="${YT-2}" width="${2*HW}" height="${YB-YT+4}" fill="${X?'#707070':'#0f1720'}"/>`;
+  s+=`<rect x="${CX-HW}" y="${YT}" width="${PL}" height="${YB-YT}" fill="${cu}"/><rect x="${CX+HW-PL}" y="${YT}" width="${PL}" height="${YB-YT}" fill="${cu}"/>`;
+  // flux film
+  if(!X&&o.flux>0){const h=(YB-YT)*o.flux;for(const x0 of [CX-HW+PL,CX+PW]){s+=`<rect x="${x0}" y="${YB-h}" width="${HW-PL-PW}" height="${h}" fill="#d9e84a" opacity=".55"/>`}}
+  // wave
+  if(o.wave>0){const top=lerp(900,YB+2,o.wave);let d=`M0 ${top}`;for(let x=0;x<=1920;x+=40)d+=` L${x} ${top+6*Math.sin(x/90+(o.t||0)*3)}`;d+=` L1920 888 L0 888Z`;s+=`<path d="${d}" fill="${X?'#3a3a3a':'#c3ccd6'}"/><path d="${d}" fill="url(#waveg)" opacity=".5"/>`}
+  // solder in the barrel + bottom fillet
+  const sc=X?'#141414':(o.frozen?col.cold:col.solder);
+  if(o.fill>0){const h=(YB-YT)*o.fill;for(const x0 of [CX-HW+PL,CX+PW]){s+=`<rect x="${x0}" y="${YB-h}" width="${HW-PL-PW}" height="${h+1}" fill="${sc}"/>`}
+    // meniscus
+    const yT=YB-h;s+=`<path d="M${CX-HW+PL} ${yT+1} Q${CX-HW+PL+25} ${yT+14} ${CX-PW} ${yT-10} L${CX-PW} ${yT+1}Z" fill="${X?'#707070':'#0f1720'}"/><path d="M${CX+HW-PL} ${yT+1} Q${CX+HW-PL-25} ${yT+14} ${CX+PW} ${yT-10} L${CX+PW} ${yT+1}Z" fill="${X?'#707070':'#0f1720'}"/>`}
+  if(o.fillet>0){const k=o.fillet;s+=`<path d="M${CX-HW-80} ${YB} L${CX-PW} ${YB+95*k} L${CX-PW} ${YB}Z" fill="${sc}"/><path d="M${CX+HW+80} ${YB} L${CX+PW} ${YB+95*k} L${CX+PW} ${YB}Z" fill="${sc}"/>`}
+  if(o.topFillet>0){s+=`<path d="M${CX-HW-40} ${YT} L${CX-PW} ${YT-4} L${CX-PW} ${YT}Z" fill="${sc}"/>`}
+  // pin
+  s+=`<path d="M${CX-PW} 120 L${CX+PW} 120 L${CX+PW} 800 L${CX+PW-22} 822 L${CX-PW+22} 822 L${CX-PW} 800Z" fill="${pin}" stroke="${X?'#1a1a1a':'#8c939c'}" stroke-width="2"/>`;
+  if(!X)s+=`<rect x="700" y="70" width="720" height="60" rx="10" fill="${body}"/>`;
+  // crack
+  if(o.crack>0){const k=o.crack;const pts=[[CX-PW-2,YB-8],[CX-PW-18,YB-40],[CX-PW-6,YB-70],[CX-PW-24,YB-104]];let d='';const n=Math.max(1,Math.round(k*(pts.length-1)));for(let i=0;i<=n;i++)d+=(i?' L':'M')+pts[i][0]+' '+pts[i][1];
+    s+=`<path d="${d}" stroke="#101010" stroke-width="10" fill="none" stroke-linejoin="bevel"/><path d="${d}" stroke="${col.red}" stroke-width="4" fill="none"/>`}
+  // ground-connection highlight
+  if(o.gnd>0){for(const [y0,y1,n] of LAY){if(n==='L3')continue;for(const x0 of [CX-HW-34,CX+HW-6])s+=`<rect x="${x0}" y="${y0-7}" width="40" height="${y1-y0+14}" rx="6" fill="none" stroke="${col.teal}" stroke-width="5" opacity="${o.gnd}"/>`}}
+  return s;
+}
+function heatArrows(t,k){let s='';if(k<=0)return s;for(const [y0,y1,n] of LAY){if(n==='L3')continue;const y=(y0+y1)/2;for(const d of [-1,1]){for(let i=0;i<5;i++){const ph=((t*0.9+i/5)%1);const x=CX+d*(HW+40+ph*430);const a=k*(1-ph)*0.95;s+=`<path d="M${x-d*14} ${y-13} L${x+d*8} ${y} L${x-d*14} ${y+13}" stroke="${col.cuHot}" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="${a}"/>`}}}return s}
+const DEFS=`<defs><linearGradient id="heatL" x1="1" x2="0"><stop offset="0" stop-color="#ff5a1a"/><stop offset="1" stop-color="#ff5a1a" stop-opacity="0"/></linearGradient><linearGradient id="heatR" x1="0" x2="1"><stop offset="0" stop-color="#ff5a1a"/><stop offset="1" stop-color="#ff5a1a" stop-opacity="0"/></linearGradient>
+<linearGradient id="waveg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#7d8894"/></linearGradient>
+<radialGradient id="vig"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".85"/></radialGradient>
+<clipPath id="xc"><circle cx="1240" cy="470" r="380"/></clipPath></defs>`;
+const panel=(x,y,w,h,o=1)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="${col.panel}" stroke="#263545" stroke-width="2" opacity="${o}"/>`;
+const gauge=(f,o,ok)=>{   // fill gauge at the right of the hole
+  const x=CX+HW+150;let s=`<g opacity="${o}"><line x1="${x}" y1="${YT}" x2="${x}" y2="${YB}" stroke="#e8eef4" stroke-width="4"/><line x1="${x-14}" y1="${YT}" x2="${x+14}" y2="${YT}" stroke="#e8eef4" stroke-width="4"/><line x1="${x-14}" y1="${YB}" x2="${x+14}" y2="${YB}" stroke="#e8eef4" stroke-width="4"/>`;
+  const y=YB-(YB-YT)*f;s+=`<rect x="${x-9}" y="${y}" width="18" height="${YB-y}" fill="${ok?col.grn:col.red}"/>`;
+  s+=(ok?tx(x-22,y+56,Math.round(f*100)+'%',44,col.grn,'end',800):tx(x+34,y+12,Math.round(f*100)+'%',44,col.red,'start',800)+tx(x+34,YT-18,'100%',22,'#9fb0c0'))+tx(x+34,YB+30,'0%',22,'#9fb0c0')+`</g>`;return s};
+const line75=o=>{const y=YB-(YB-YT)*0.75;return `<g opacity="${o}"><line x1="${CX-HW-120}" y1="${y}" x2="${CX+HW+330}" y2="${y}" stroke="${col.amb}" stroke-width="4" stroke-dasharray="16 10"/>`+tx(CX+HW+345,y-8,'≥ 75%',40,col.amb,'start',800)+tx(CX+HW+345,y+30,'IPC-A-610 Class 3 · 3 级',24,col.amb)+`</g>`};
+const eye=(x,y,blocked,o)=>`<g opacity="${o}" transform="translate(${x} ${y})"><path d="M-46 0 Q0 -40 46 0 Q0 40 -46 0Z" fill="none" stroke="#e8eef4" stroke-width="5"/><circle r="14" fill="#e8eef4"/>${blocked?`<line x1="-44" y1="34" x2="44" y2="-34" stroke="${col.red}" stroke-width="8" stroke-linecap="round"/>`:''}</g>`;
+function labelsX(o){if(o<=0)return '';let s=`<g opacity="${o}">`;
+  for(const [y0,y1,n,net] of LAY){s+=tx(470,y1+3,`${n} · ${net}`,24,n==='L3'?'#e9c35a':'#ffc38a','start',700)}
+  s+=bi(1170,116,'Connector body (J1)','连接器本体',24)+bi(CX,176,'Pin 2','第 2 脚',24,'middle')+`</g>`;return s}
+function leftList(t){   // scene 5 change list
+  const it=[[C[9].start+3.2,'1','More preheat','加强预热','top side ≥ 110 °C','顶面 ≥ 110 °C'],[C[10].start,'2','Longer contact time','延长接触时间','conveyor speed ↓','链速 ↓'],[C[11].start,'3','Flux through the hole','助焊剂穿透通孔','reaches the top side','到达顶面']];
+  let s=panel(30,300,480,560)+bi(60,356,'Process changes','工艺调整',30);
+  it.forEach(([t0,n,en,zh,d1,d2],i)=>{const y=450+i*138,o=0.25+0.75*er(t,t0,t0+0.5),act=t>=t0&&(i===2||t<it[i+1][0])&&t<C[12].start;
+    s+=`<g opacity="${o}"><circle cx="86" cy="${y}" r="26" fill="${act?col.amb:'#263545'}"/>`+tx(86,y+11,n,30,act?'#0f1720':col.txt,'middle',800)+tx(126,y-12,en,25,col.txt,'start',700)+tx(126,y+20,zh,25,col.zh)+tx(126,y+52,d1+' · '+d2,20,'#9fb0c0')+`</g>`});
+  return s}
+function draw2d(t){
+  let s=DEFS, sc=0;for(let k=1;k<=7;k++)if(t>=T[k])sc=k;
+  const c=i=>C[i].start;
+  if(sc===3){
+    const wave=er(t,c(4)-0.2,c(4)+1.6), fill=0.40*er(t,c(4)+1.6,c(5)+1.5), frozen=t>c(5)+1.8, heat=er(t,c(4)+2.6,c(4)+3.6);
+    s+=xsec({t,wave,fill,frozen,heat,fillet:er(t,c(4)+1.5,c(4)+2.6),gnd:er(t,c(3)+4.2,c(3)+4.8)*(1-er(t,c(4)-0.5,c(4)))*(0.6+0.4*Math.sin(t*6))});
+    s+=heatArrows(t,heat)+labelsX(er(t,c(3)+0.8,c(3)+1.6));
+    s+=bi(60,640,'Solder wave','锡波',26,'start',wave)+`<g opacity="${heat}">`+bi(1500,170,'Heat flows into the copper','热量被铜箔吸走',26)+`</g>`;
+    if(t>c(5)+2.2)s+=gauge(0.40,er(t,c(5)+2.2,c(5)+2.8),false);
+    if(frozen)s+=`<g opacity="${er(t,c(5)+1.8,c(5)+2.4)}">`+bi(60,470,'Solder froze here','焊锡在此凝固',26)+`<line x1="300" y1="${YB-0.4*(YB-YT)}" x2="${CX-HW-10}" y2="${YB-0.4*(YB-YT)}" stroke="#e8eef4" stroke-width="3" stroke-dasharray="6 6"/></g>`;
+  } else if(sc===4){
+    const cr=er(t,c(8)+0.6,c(8)+2.4), shake=t>c(8)+0.3?Math.sin(t*38)*3*(1-er(t,c(8)+3.2,c(8)+4)):0;
+    s+=`<g transform="translate(${shake} 0)">`+xsec({t,fill:0.40,frozen:true,fillet:1,crack:cr})+`</g>`+labelsX(0.9)+gauge(0.40,1,false)+line75(er(t,c(6)+1.2,c(6)+1.8));
+    s+=`<g opacity="${er(t,c(6)+3,c(6)+3.5)}">`+tx(CX+HW+345,YB-(YB-YT)*0.4+60,'✗ NG · 不合格',34,col.red,'start',800)+`</g>`;
+    const e=er(t,c(7)+0.4,c(7)+1), e2=er(t,c(7)+3,c(7)+3.6), off=1-er(t,c(8)-0.4,c(8));
+    s+=eye(110,720,false,e*off)+`<g opacity="${e*off}">`+bi(180,712,'Bottom view: looks normal','底面：看起来正常',24)+`</g>`+eye(110,190,true,e2*off)+`<g opacity="${e2*off}">`+bi(180,182,'Top view: hidden by the connector','顶面：被连接器挡住',24)+`</g>`;
+    const p=er(t,c(8)+2.2,c(8)+2.9);s+=`<g opacity="${p}">`+panel(40,560,480,280)+bi(70,620,'Vibration + heat → crack','振动 + 发热 → 开裂',26)+tx(70,760,'24 V',54,col.red,'start',800)+`<path d="M230 742 L300 742" stroke="${col.red}" stroke-width="8"/><path d="M330 742 L400 742" stroke="${col.red}" stroke-width="8"/><path d="M300 716 L330 768 M330 716 L300 768" stroke="${col.red}" stroke-width="7"/>`+tx(70,812,'Pump loses power · 泵断电',24,col.txt)+`</g>`;
+  } else if(sc===5){
+    const pre=er(t,c(9)+3.4,c(9)+9), flux=er(t,c(11)+0.8,c(11)+3.4), wave=er(t,c(12)-0.3,c(12)+1.2), fill=er(t,c(12)+1.0,c(12)+3.6);
+    s+=xsec({t,warm:pre,flux:flux*(1-er(t,c(12)+1,c(12)+2)),wave,fill:fill*0.985,fillet:er(t,c(12)+1,c(12)+2),topFillet:fill>0.97?1:0});
+    // preheater bars under the board (before the wave arrives)
+    const hb=er(t,c(9)+3.2,c(9)+4)*(1-wave);
+    if(hb>0){for(let i=0;i<5;i++){const x=560+i*170;s+=`<rect x="${x}" y="780" width="110" height="26" rx="13" fill="#ff6a1a" opacity="${hb*(0.7+0.3*Math.sin(t*4+i))}"/>`;for(let j=0;j<3;j++){const ph=(t*0.8+j/3+i*0.13)%1;s+=`<path d="M${x+55} ${770-ph*190} q14 -14 0 -28 q-14 -14 0 -28" stroke="#ff8a3a" stroke-width="5" fill="none" opacity="${hb*(1-ph)*0.8}"/>`}}
+      s+=`<g opacity="${hb}">`+tx(560,852,'Preheater · 预热器',24)+`</g>`}
+    // thermometer on the top side
+    const th=er(t,c(9)+3.4,c(9)+4);if(th>0){const temp=Math.round(lerp(25,116,pre));const ok=temp>=110;s+=`<g opacity="${th*(1-er(t,c(12)+0.2,c(12)+0.9))}">`+panel(1480,124,400,150)+tx(1505,168,'Top side at J1 · J1 顶面温度',22,'#9fb0c0')+tx(1505,242,temp+' °C',62,ok?col.grn:col.amb,'start',800)+tx(1730,242,ok?'✓':'↑',54,ok?col.grn:col.amb,'start',800)+`<line x1="1480" y1="264" x2="${CX+HW+60}" y2="${YT-4}" stroke="#9fb0c0" stroke-width="2"/><circle cx="${CX+HW+60}" cy="${YT-4}" r="8" fill="${ok?col.grn:col.amb}"/></g>`}
+    // contact time: conveyor + stopwatch
+    const ct=er(t,c(10)+0.3,c(10)+0.9)*(1-er(t,c(11)-0.4,c(11)));if(ct>0){const a=(t-c(10))*1.2;s+=`<g opacity="${ct}">`+panel(1480,560,400,290)+bi(1505,606,'Contact time ↑','接触时间 ↑',26)+`<circle cx="1590" cy="760" r="56" fill="none" stroke="#e8eef4" stroke-width="6"/><line x1="1590" y1="760" x2="${1590+44*Math.sin(a)}" y2="${760-44*Math.cos(a)}" stroke="${col.amb}" stroke-width="7" stroke-linecap="round"/><rect x="1580" y="690" width="20" height="14" fill="#e8eef4"/>`+bi(1670,740,'Conveyor ↓','链速 ↓',24);
+      for(let i=0;i<3;i++){const ph=(t*0.25+i/3)%1;s+=`<path d="M${1690+ph*150} 820 l22 0 m-10 -9 l10 9 l-10 9" stroke="${col.teal}" stroke-width="5" fill="none" opacity="${1-ph}"/>`}s+=`</g>`}
+    const fl=er(t,c(11)+0.4,c(11)+1)*(1-er(t,c(12)-0.4,c(12)));if(fl>0)s+=`<g opacity="${fl}">`+bi(1500,330,'Flux reaches the top side','助焊剂到达顶面',26)+`<line x1="1495" y1="336" x2="${CX+HW-20}" y2="${YT+30}" stroke="#d9e84a" stroke-width="3"/></g>`;
+    if(fill>0.02)s+=gauge(fill*0.985,er(t,c(12)+1,c(12)+1.5),fill*0.985>=0.75)+line75(er(t,c(12)+1,c(12)+1.5));
+    if(fill>0.99)s+=`<g opacity="${er(t,c(12)+3.6,c(12)+4.1)}">`+tx(CX+HW+345,YB-24,'✓ OK · 合格',36,col.grn,'start',800)+`</g>`;
+    s+=leftList(t);
+  } else if(sc===6){
+    const a=er(t,T[6]+0.2,T[6]+1.2);
+    s+=`<g opacity="${a}">`+panel(40,90,640,770);
+    // schematic: tube, beam, board, detector
+    s+=bi(70,150,'X-ray inspection','X 光检查',34)+`<rect x="250" y="220" width="150" height="90" rx="12" fill="#3a4a5c" stroke="#9fb0c0" stroke-width="3"/>`+tx(325,275,'X-ray',26,col.txt,'middle',700)+`<path d="M300 310 L150 700 L560 700 L350 310Z" fill="${col.teal}" opacity="${0.18+0.08*Math.sin(t*5)}"/>`;
+    s+=`<g transform="rotate(-12 350 520)"><rect x="140" y="505" width="430" height="30" fill="${col.fr4}"/><rect x="140" y="505" width="430" height="5" fill="${col.cu}"/><rect x="140" y="530" width="430" height="5" fill="${col.cu}"/><rect x="335" y="440" width="26" height="150" fill="${col.pin}"/><rect x="280" y="455" width="140" height="50" rx="6" fill="${col.body}"/></g>`;
+    s+=`<rect x="130" y="700" width="450" height="26" rx="6" fill="#56677a"/>`+tx(355,770,'Detector · 探测器',24,'#9fb0c0','middle')+tx(355,830,'Tilted view shows the fill height · 倾斜角度可看到透锡高度',21,'#9fb0c0','middle')+`</g>`;
+    // x-ray image
+    const b=er(t,C[13].start+0.6,C[13].start+1.6);
+    s+=`<g opacity="${b}"><circle cx="1240" cy="470" r="388" fill="#111"/><g clip-path="url(#xc)"><g transform="translate(${1240-CX*1.0} 84)">`+xsec({xray:true,fill:0.92,fillet:1,topFillet:0})+`</g><rect x="820" y="60" width="840" height="820" fill="url(#vig)"/></g><circle cx="1240" cy="470" r="384" fill="none" stroke="#3a4a5c" stroke-width="8"/></g>`;
+    const m=er(t,C[13].start+3,C[13].start+3.8);const yt=YT+84,yb=YB+84,y75=yb-(yb-yt)*0.75,yf=yb-(yb-yt)*0.92,gx=1240+HW+36;
+    s+=`<g opacity="${m}"><line x1="${gx}" y1="${yt}" x2="${gx}" y2="${yb}" stroke="#fff" stroke-width="3"/><line x1="${gx-10}" y1="${yt}" x2="${gx+10}" y2="${yt}" stroke="#fff" stroke-width="3"/><line x1="${gx-10}" y1="${yb}" x2="${gx+10}" y2="${yb}" stroke="#fff" stroke-width="3"/>`+tx(gx+16,(yt+yb)/2+50,'H',30,'#fff','start',700)+`<line x1="${1240-HW-30}" y1="${yf}" x2="${1240+HW+30}" y2="${yf}" stroke="${col.grn}" stroke-width="4"/>`+tx(1240-HW-40,yf+10,'h',30,col.grn,'end',800)+`<line x1="${1240-HW-60}" y1="${y75}" x2="${1240+HW+60}" y2="${y75}" stroke="${col.amb}" stroke-width="4" stroke-dasharray="14 9"/>`+tx(1240-HW-70,y75+12,'75%',30,col.amb,'end',800)+`</g>`;
+    s+=`<g opacity="${er(t,C[13].start+4.4,C[13].start+5)}">`+panel(1570,330,320,170)+tx(1730,400,'h ÷ H ≥ 75%',38,col.grn,'middle',800)+tx(1730,456,'J1 pin 2 · J1 第 2 脚',24,col.txt,'middle')+`</g>`;
+    const l=er(t,C[14].start,C[14].start+0.6);s+=`<g opacity="${l}">`+panel(1570,560,320,290,1)+bi(1600,616,'With each lot','每批出货附图',26);
+    for(let i=0;i<3;i++)s+=`<rect x="${1610+i*14}" y="${740-i*14}" width="120" height="90" rx="8" fill="#22303f" stroke="#9fb0c0" stroke-width="3"/>`;s+=`<circle cx="1698" cy="757" r="26" fill="#111" stroke="#666" stroke-width="3"/><rect x="1690" y="738" width="16" height="38" fill="#333"/>`;
+    const ph=(t*0.6)%1;s+=`<path d="M${1790+ph*40} 760 l34 0 m-14 -13 l14 13 l-14 13" stroke="${col.teal}" stroke-width="6" fill="none"/></g>`;
+  } else if(sc===7){
+    const tiles=[['More preheat','加强预热','Top side at J1 ≥ 110 °C','J1 顶面温度 ≥ 110 °C','heat'],['Longer contact time','延长接触时间','Slow the conveyor','降低链速','clock'],['Flux through the hole','助焊剂穿透通孔','Flux must reach the top side','助焊剂要到达顶面','flux'],['X-ray proof','X 光确认','Fill ≥ 75% · image with each lot','透锡率 ≥ 75% · 每批附图','xray']];
+    tiles.forEach(([en,zh,d1,d2,ic],i)=>{const x=60+i*455,o=er(t,T[7]+0.3+i*0.35,T[7]+0.9+i*0.35);s+=`<g opacity="${o}">`+panel(x,120,435,400)+`<circle cx="${x+70}" cy="200" r="40" fill="${col.amb}"/>`+tx(x+70,216,String(i+1),44,'#0f1720','middle',900);
+      const ix=x+300,iy=200;
+      if(ic==='heat')for(let j=0;j<3;j++)s+=`<path d="M${ix-36+j*36} ${iy+34} q16 -17 0 -34 q-16 -17 0 -34" stroke="#ff7a1a" stroke-width="8" fill="none" stroke-linecap="round"/>`;
+      if(ic==='clock')s+=`<circle cx="${ix}" cy="${iy}" r="42" fill="none" stroke="#e8eef4" stroke-width="7"/><path d="M${ix} ${iy-26} L${ix} ${iy} L${ix+20} ${iy+12}" stroke="${col.teal}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+      if(ic==='flux')s+=`<rect x="${ix-34}" y="${iy-42}" width="14" height="84" fill="${col.cu}"/><rect x="${ix+20}" y="${iy-42}" width="14" height="84" fill="${col.cu}"/><rect x="${ix-20}" y="${iy-42}" width="40" height="84" fill="#d9e84a" opacity=".8"/><path d="M${ix} ${iy+30} L${ix} ${iy-30} m-12 14 l12 -14 l12 14" stroke="#0f1720" stroke-width="6" fill="none"/>`;
+      if(ic==='xray')s+=`<circle cx="${ix}" cy="${iy}" r="44" fill="#111" stroke="#667" stroke-width="5"/><rect x="${ix-9}" y="${iy-34}" width="18" height="68" fill="#444"/><rect x="${ix-22}" y="${iy-18}" width="13" height="42" fill="#222"/><rect x="${ix+9}" y="${iy-18}" width="13" height="42" fill="#222"/>`;
+      s+=tx(x+30,330,en,32,col.txt,'start',800)+tx(x+30,376,zh,32,col.zh,'start',700)+tx(x+30,436,d1,23,'#c5d0db')+tx(x+30,472,d2,23,'#c5d0db')+`</g>`});
+    const o=er(t,C[16].start-0.2,C[16].start+0.6);
+    s+=`<g opacity="${o}">`+panel(60,560,1800,290)+bi(100,624,'Our side — board Rev B: thermal relief on J1 pin 2','我方 — 电路板 B 版：J1 第 2 脚增加花焊盘',30);
+    s+=`<image href="j1_gnd_plane.png" x="1010" y="590" width="230" height="230" preserveAspectRatio="xMidYMid slice"/>`+tx(1125,842,'Rev A · ground layer at J1 · black = copper 黑色 = 铜',19,'#9fb0c0','middle');
+    // rev B drawing: spoke pad
+    s+=`<rect x="1500" y="590" width="230" height="230" fill="#000"/><circle cx="1615" cy="705" r="66" fill="#fff"/><circle cx="1615" cy="705" r="44" fill="#000"/><circle cx="1615" cy="705" r="22" fill="#fff"/><rect x="1601" y="630" width="28" height="150" fill="#000"/><rect x="1540" y="691" width="150" height="28" fill="#000"/><circle cx="1615" cy="705" r="22" fill="#fff"/>`+tx(1615,842,'Rev B · four spokes · 四条连接筋',19,'#9fb0c0','middle')+`<path d="M1290 705 l150 0 m-26 -22 l26 22 l-26 22" stroke="${col.teal}" stroke-width="8" fill="none"/>`;
+    s+=tx(100,760,'Solid copper pulls heat away. Spokes keep the heat in the hole.',24,'#c5d0db')+tx(100,798,'整片铜箔散热快；连接筋能把热量留在孔内。',24,'#c5d0db')+`</g>`;
+  }
+  return s;
+}
+// ---------------- frame ----------------
+window.setTime=function(t){
+  const in3d=t<T[3]+0.7;
+  $('gl').style.visibility=in3d?'visible':'hidden';
+  if(in3d){cam3(t);r.render(scene,cam);$('ov').innerHTML=t>=T[2]?labels3(t):'';$('gl').style.opacity=1-er(t,T[3],T[3]+0.6);$('ov').style.opacity=1-er(t,T[3]-0.3,T[3])}else $('ov').innerHTML='';
+  $('svg').innerHTML=t>=T[3]?draw2d(t):'';
+  // crossfades between 2D scenes: quick dip
+  let dip=0;for(const k of [4,5,6,7])dip=Math.max(dip,1-Math.abs(t-T[k])/0.35);
+  $('svg').style.opacity=(t<T[3]+0.6?er(t,T[3],T[3]+0.6):1)*(1-cl(dip)*0.85);
+  $('title').style.opacity=(1-er(t,T[2]-0.8,T[2]-0.2))*er(t,0.2,1.0);
+  $('head').style.opacity=er(t,T[2]+0.5,T[2]+1.2)*(1-er(t,T[6]-0.3,T[6]));$('demo').style.opacity=er(t,0.2,1)*0.95;
+  const q=C.find(c=>t>=c.start-0.1&&t<c.start+c.dur+0.35);
+  $('en').textContent=q?q.en:'';$('zh').textContent=q?q.zh:'';
+  const end=1-er(t,TOTAL-0.7,TOTAL-0.1);$('stage').style.opacity=Math.min(end,er(t,0,0.5));
+};
+window.setTime(0);window.ready=true;
+</script></body></html>

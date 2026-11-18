@@ -1,0 +1,175 @@
+{
+ "cues": [
+  {
+   "i": 0,
+   "scene": 1,
+   "start": 0.8,
+   "dur": 6.316,
+   "en": "This is the Meridian IP-1 irrigation pump. This short video is about one solder joint on its main controller board.",
+   "zh": "这是 Meridian IP-1 手术灌注泵。本视频说明它的主控板上一个焊点的问题。",
+   "en_len": 6.32,
+   "zh_len": 5.55
+  },
+  {
+   "i": 1,
+   "scene": 2,
+   "start": 8.866,
+   "dur": 4.725,
+   "en": "Inside the pump, the main controller board drives the motor, the valve and the sensors.",
+   "zh": "泵的内部有一块主控板，负责驱动电机、阀门和传感器。",
+   "en_len": 4.69,
+   "zh_len": 4.73
+  },
+  {
+   "i": 2,
+   "scene": 2,
+   "start": 14.141,
+   "dur": 5.468,
+   "en": "The problem is at connector J1, the 24 V power input. Pin 2 is the ground pin.",
+   "zh": "问题出在 J1（24 V 电源输入连接器）：第 2 脚是接地引脚。",
+   "en_len": 5.47,
+   "zh_len": 5.19
+  },
+  {
+   "i": 3,
+   "scene": 3,
+   "start": 21.359,
+   "dur": 8.371,
+   "en": "This is a cut through that hole. The board has four copper layers, and this pin is tied solidly to the ground copper on three of them.",
+   "zh": "这是这个通孔的剖面。电路板有四层铜，这个引脚与其中三层的接地铜箔是整片直接相连的。",
+   "en_len": 6.65,
+   "zh_len": 8.37
+  },
+  {
+   "i": 4,
+   "scene": 3,
+   "start": 30.28,
+   "dur": 6.432,
+   "en": "In wave soldering, solder enters from the bottom. But the large copper areas pull heat out of the hole.",
+   "zh": "波峰焊时，焊锡从底面进入通孔。但是大面积的铜箔把孔里的热量吸走了。",
+   "en_len": 4.95,
+   "zh_len": 6.43
+  },
+  {
+   "i": 5,
+   "scene": 3,
+   "start": 37.262,
+   "dur": 6.037,
+   "en": "The solder cools and freezes before it reaches the top. Here it fills only about 40% of the hole.",
+   "zh": "焊锡还没有爬到顶面，就冷却凝固了。这里的透锡率只有约 40%。",
+   "en_len": 5.54,
+   "zh_len": 6.04
+  },
+  {
+   "i": 6,
+   "scene": 4,
+   "start": 45.049,
+   "dur": 5.921,
+   "en": "The requirement for this product is IPC Class 3. Solder must fill at least 75% of the hole.",
+   "zh": "本产品按 IPC-A-610 3 级验收，通孔透锡率必须 ≥ 75%。",
+   "en_len": 5.92,
+   "zh_len": 5.48
+  },
+  {
+   "i": 7,
+   "scene": 4,
+   "start": 51.52,
+   "dur": 7.709,
+   "en": "From the bottom, this joint looks normal, and the connector body hides the top. A visual check will not catch it.",
+   "zh": "从底面看，这个焊点是正常的，而顶面被连接器本体挡住了，所以目检发现不了这个问题。",
+   "en_len": 5.4,
+   "zh_len": 7.71
+  },
+  {
+   "i": 8,
+   "scene": 4,
+   "start": 59.779,
+   "dur": 6.351,
+   "en": "But the joint is weak. With vibration and heat it can crack, and the pump loses power.",
+   "zh": "但是这样的焊点强度不够。在振动和发热的作用下，它可能开裂，导致泵断电。",
+   "en_len": 4.46,
+   "zh_len": 6.35
+  },
+  {
+   "i": 9,
+   "scene": 5,
+   "start": 67.88,
+   "dur": 11.691,
+   "en": "Here is what we need changed in the wave soldering process. 1: More preheat. The top side of the board at this connector should reach at least 110 °C before it touches the wave.",
+   "zh": "下面是波峰焊工艺需要调整的地方。第一，加强预热：接触锡波之前，此连接器位置的板子顶面温度要 ≥ 110 °C。",
+   "en_len": 10.32,
+   "zh_len": 11.69
+  },
+  {
+   "i": 10,
+   "scene": 5,
+   "start": 80.121,
+   "dur": 5.724,
+   "en": "2: Longer contact time. Slow the conveyor so this pin stays in the solder longer.",
+   "zh": "第二，延长接触时间：降低链速，让这个引脚在锡波中停留更久。",
+   "en_len": 5.06,
+   "zh_len": 5.72
+  },
+  {
+   "i": 11,
+   "scene": 5,
+   "start": 86.395,
+   "dur": 5.364,
+   "en": "3: Flux. Make sure flux gets all the way through the hole to the top side.",
+   "zh": "第三，助焊剂：要保证助焊剂能够穿过整个通孔，到达顶面。",
+   "en_len": 4.27,
+   "zh_len": 5.36
+  },
+  {
+   "i": 12,
+   "scene": 5,
+   "start": 92.309,
+   "dur": 5.224,
+   "en": "With enough heat in the hole, the solder keeps flowing and fills the hole to the top.",
+   "zh": "孔里的热量足够了，焊锡就能继续向上流动，把通孔填满。",
+   "en_len": 4.1,
+   "zh_len": 5.22
+  },
+  {
+   "i": 13,
+   "scene": 6,
+   "start": 99.283,
+   "dur": 8.533,
+   "en": "Please check this joint by X-ray, not by eye. Measure the fill height on J1 pin 2. It must be 75% or more.",
+   "zh": "请用 X 光检查这个焊点，不要只靠目检。测量 J1 第 2 脚的透锡高度，必须 ≥ 75%。",
+   "en_len": 7.62,
+   "zh_len": 8.53
+  },
+  {
+   "i": 14,
+   "scene": 6,
+   "start": 108.367,
+   "dur": 3.03,
+   "en": "Send us the X-ray image with each lot.",
+   "zh": "每一批出货，请附上 X 光照片。",
+   "en_len": 2.3,
+   "zh_len": 3.03
+  },
+  {
+   "i": 15,
+   "scene": 7,
+   "start": 113.147,
+   "dur": 8.557,
+   "en": "To summarize: more preheat, longer contact time, flux through the hole, and X-ray proof of 75% fill.",
+   "zh": "总结：加强预热，延长接触时间，助焊剂穿透通孔，并用 X 光确认透锡率 ≥ 75%。",
+   "en_len": 7.37,
+   "zh_len": 8.56
+  },
+  {
+   "i": 16,
+   "scene": 7,
+   "start": 122.253,
+   "dur": 6.769,
+   "en": "On our side, the next board revision adds thermal relief on this pin, to make it easier to solder. Thank you.",
+   "zh": "我们这边，下一版电路板会在这个引脚上增加花焊盘，让它更容易焊接。谢谢。",
+   "en_len": 5.86,
+   "zh_len": 6.77
+  }
+ ],
+ "total": 131.07
+}
